@@ -1,8 +1,15 @@
 #!/usr/bin/python
 
+import os
 from os import path
 import glob
 import sys
+
+def directory_separator():
+    if os.name == 'nt':
+        return '\\'
+    else:
+        return '/'
 
 def generate_gallery(img_dir, gallery_file):
     tab = "    "
@@ -15,7 +22,7 @@ def generate_gallery(img_dir, gallery_file):
         file_list.append(rel_dir)
 
     for x in file_list:
-        file_names.append(x.split('/')[-1])
+        file_names.append(x.split(directory_separator())[-1])
 
     with open(gallery_file, "w") as outfile:
         outfile.write("""<html>
