@@ -25,12 +25,62 @@ def generate_gallery(img_dir, gallery_file):
         file_names.append(x.split(directory_separator())[-1])
 
     with open(gallery_file, "w") as outfile:
-        outfile.write("""<html>
-{}<head>
-{}<title>Gallery</title>
-{}<head>
-{}<body>
-{}<table>\n""".format(tab, tab*2, tab, tab, tab*2))
+        outfile.write("""
+<html>
+    <head>
+        <title>Gallery</title>
+	<style>
+		body {
+			z-index: 1;
+			width: 100%;
+		}
+		#header {
+			width: 75%;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		table {
+			margin-right: auto;
+			margin-left: auto;
+		}
+		#imgView {
+			height: 100%;
+			width: 100%;
+			background-color: black;
+			text-align: center;
+			position: fixed;
+			z-index: 2;
+			display: none;
+		}
+		#imgView img {
+			left: auto;
+			right: auto;
+			margin-top: 100px;
+		}
+
+	</style>
+        <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+	<script>
+		var closeImg = function() {
+			$('#imgView img').remove();
+			$('#imgView br').remove();
+			$('#imgView a').remove();
+			$('#imgView').toggle('fast');
+			$('#header').toggle('fast');
+			$('h1').toggle('fast');
+		};
+		var showImg = function(imgFile) {
+			$('#header').toggle('fast');
+			$('h1').toggle('fast');
+			$('#imgView').toggle('fast');
+			$('#imgView').append('<img src="' + imgFile + '"><br />');
+			$('#imgView').append('<a href="javascript:closeImg()">Back to Gallery</a>');
+		};
+	</script>
+    </head>
+    <body>
+    <div id="imgView"></div>
+        <table>\n""")
         for x in range(7):
             outfile.write(tab*3 + "<tr>\n")
             for y in range(3):
@@ -39,15 +89,15 @@ def generate_gallery(img_dir, gallery_file):
                     " alt=\"" + file_names[counter] + "\" /></a></td>\n")
                 counter += 1
             outfile.write(tab*3 + "</tr>\n")
-        outfile.write("""{}</table>
-{}</body>
-</html>""".format(tab*2, tab))
+        outfile.write("""
+        </table>
+    </body>
+</html>""")
 
 if len(sys.argv) < 3:
-    print "Usage: pygallery <IMAGE_DIRECTORY> <GALLERY_FILE>"
+    print "Usage: pygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
 else:
     img_dir = sys.argv[1]
     gallery_file = sys.argv[2]
     generate_gallery(img_dir, gallery_file)
-
 
