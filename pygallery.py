@@ -1,10 +1,13 @@
 #!/usr/bin/python
 
-import os
+import os       
 from os import path
 import glob
 import sys
 
+""" Determine appropriate directory delimiter
+    Based on the operating system
+    (Assuming Windows or POSIX-Compatible systems) """
 def directory_separator():
     if os.name == 'nt':
         return '\\'
