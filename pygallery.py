@@ -5,10 +5,11 @@ from os import path
 import glob
 import sys
 
-""" Determine appropriate directory delimiter
-    Based on the operating system
-    (Assuming Windows or POSIX-Compatible systems) """
 def directory_separator():
+    """Determine appropriate directory delimiter
+    Based on the operating system
+    (Assuming Windows or POSIX-Compatible systems)"""
+
     if os.name == 'nt':
         return '\\'
     else:
@@ -37,11 +38,6 @@ def generate_gallery(img_dir, gallery_file):
 			z-index: 1;
 			width: 100%;
 		}
-		#header {
-			width: 75%;
-			margin-left: auto;
-			margin-right: auto;
-		}
 		table {
 			margin-right: auto;
 			margin-left: auto;
@@ -69,11 +65,9 @@ def generate_gallery(img_dir, gallery_file):
 			$('#imgView br').remove();
 			$('#imgView a').remove();
 			$('#imgView').toggle('fast');
-			$('#header').toggle('fast');
 			$('h1').toggle('fast');
 		};
 		var showImg = function(imgFile) {
-			$('#header').toggle('fast');
 			$('h1').toggle('fast');
 			$('#imgView').toggle('fast');
 			$('#imgView').append('<img src="' + imgFile + '"><br />');
@@ -83,6 +77,7 @@ def generate_gallery(img_dir, gallery_file):
     </head>
     <body>
     <div id="imgView"></div>
+    <h1 style="text-align: center">Gallery</h1>
         <table>\n""")
         for x in range(7):
             outfile.write(tab*3 + "<tr>\n")
@@ -97,10 +92,12 @@ def generate_gallery(img_dir, gallery_file):
     </body>
 </html>""")
 
-if len(sys.argv) < 3:
-    print "Usage: pygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
-else:
-    img_dir = sys.argv[1]
-    gallery_file = sys.argv[2]
-    generate_gallery(img_dir, gallery_file)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print "Usage: pygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
+    else:
+        img_dir = sys.argv[1]
+        gallery_file = sys.argv[2]
+        generate_gallery(img_dir, gallery_file)
 
