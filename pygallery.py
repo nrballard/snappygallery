@@ -15,18 +15,19 @@ def directory_separator():
     else:
         return '/'
 
+def table_data(file_loc):
+    return str("<td><a href=\"javascript:showImg('" + file_loc + 
+                    "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_loc + "\"" +
+                    " alt=\"" + file_loc.split(directory_separator())[-1] + "\" /></a></td>\n""")
+
 def generate_gallery(img_dir, gallery_file):
     tab = "    "
     file_list = []
-    file_names = []
-  
     counter = 0
+
     for x in glob.glob(img_dir + '*.jpg'):
         rel_dir = path.join(path.relpath(path.dirname(x), path.dirname(gallery_file)), path.basename(x))
         file_list.append(rel_dir)
-
-    for x in file_list:
-        file_names.append(x.split(directory_separator())[-1])
 
     with open(gallery_file, "w") as outfile:
         outfile.write("""
@@ -42,6 +43,9 @@ def generate_gallery(img_dir, gallery_file):
 			margin-right: auto;
 			margin-left: auto;
 		}
+                td {
+                        text-align: center;
+                }
 		#imgView {
 			height: 100%;
 			width: 100%;
@@ -79,16 +83,23 @@ def generate_gallery(img_dir, gallery_file):
     <div id="imgView"></div>
     <h1 style="text-align: center">Gallery</h1>
         <table>\n""")
-        for x in range(7):
+        for x in range(len(file_list) / 3):
             outfile.write(tab*3 + "<tr>\n")
             for y in range(3):
-                outfile.write(tab*4 + "<td><a href=\"javascript:showImg('" + file_list[counter] + 
-                    "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_list[counter] + "\"" +
-                    " alt=\"" + file_names[counter] + "\" /></a></td>\n")
+                outfile.write(tab*4 + table_data(file_list[counter]))
                 counter += 1
             outfile.write(tab*3 + "</tr>\n")
+        outfile.write(tab*2 + "</table>\n")
+
+        if len(file_list) % 3 != 0:
+            outfile.write(tab*2 + "<div style=\"display: block; text-align: center\">\n")
+            for x in range(len(file_list) % 3):
+                outfile.write(tab*3 + "<a href=\"javascript:showImg('" + file_list[counter] + 
+                        "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_list[counter] + "\"" +
+                    " alt=\"" + file_list[counter].split(directory_separator())[-1] + "\" /></a>\n")
+                counter += 1
+            outfile.write(tab*2 + "</div>")
         outfile.write("""
-        </table>
     </body>
 </html>""")
 
