@@ -25,9 +25,10 @@ def generate_gallery(img_dir, gallery_file):
     file_list = []
     counter = 0
 
-    for x in glob.glob(img_dir + '*.jpg'):
-        rel_dir = path.join(path.relpath(path.dirname(x), path.dirname(gallery_file)), path.basename(x))
-        file_list.append(rel_dir)
+    for x in glob.glob(img_dir + '*'):
+        if (x.split('.')[-1]).lower() in ('jpg', 'jpeg', 'gif', 'png', 'svg'):
+            rel_dir = path.join(path.relpath(path.dirname(x), path.dirname(gallery_file)), path.basename(x))
+            file_list.append(rel_dir)
 
     with open(gallery_file, "w") as outfile:
         outfile.write("""
