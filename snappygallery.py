@@ -15,10 +15,10 @@ def directory_separator():
     else:
         return '/'
 
-def table_data(file_loc):
-    return str("<td><a href=\"javascript:showImg('" + file_loc + 
+def make_link(file_loc):
+    return str("<a href=\"javascript:showImg('" + file_loc + 
                     "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_loc + "\"" +
-                    " alt=\"" + file_loc.split(directory_separator())[-1] + "\" /></a></td>\n""")
+                    " alt=\"" + file_loc.split(directory_separator())[-1] + "\" /></a>""")
 
 def generate_gallery(img_dir, gallery_file):
     tab = "    "
@@ -59,6 +59,8 @@ def generate_gallery(img_dir, gallery_file):
 			left: auto;
 			right: auto;
 			margin-top: 100px;
+                        max-width: 640;
+                        max-height: 480;
 		}
 
 	</style>
@@ -86,7 +88,7 @@ def generate_gallery(img_dir, gallery_file):
         for x in range(len(file_list) / 3):
             outfile.write(tab*3 + "<tr>\n")
             for y in range(3):
-                outfile.write(tab*4 + table_data(file_list[counter]))
+                outfile.write(tab*4 + "<td>" + make_link(file_list[counter]) + "</td>\n")
                 counter += 1
             outfile.write(tab*3 + "</tr>\n")
         outfile.write(tab*2 + "</table>\n")
@@ -94,9 +96,7 @@ def generate_gallery(img_dir, gallery_file):
         if len(file_list) % 3 != 0:
             outfile.write(tab*2 + "<div style=\"display: block; text-align: center\">\n")
             for x in range(len(file_list) % 3):
-                outfile.write(tab*3 + "<a href=\"javascript:showImg('" + file_list[counter] + 
-                        "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_list[counter] + "\"" +
-                    " alt=\"" + file_list[counter].split(directory_separator())[-1] + "\" /></a>\n")
+                outfile.write(tab*3 + make_link(file_list[counter]) + "\n")
                 counter += 1
             outfile.write(tab*2 + "</div>")
         outfile.write("""
