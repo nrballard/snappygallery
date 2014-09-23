@@ -6,7 +6,7 @@ import glob
 import sys
 
 def directory_separator():
-    """Determine appropriate directory delimiter
+    """Determines appropriate directory delimiter
     Based on the operating system
     (Assuming Windows or POSIX-Compatible systems)"""
 
@@ -15,21 +15,45 @@ def directory_separator():
     else:
         return '/'
 
-def make_link(file_loc):
-    return str("<a href=\"javascript:showImg('" + file_loc + 
-                    "')\">" + "<img width=\"240\" height=\"180\" src=\"" + file_loc + "\"" +
-                    " alt=\"" + file_loc.split(directory_separator())[-1] + "\" /></a>""")
 
-def generate_gallery(img_dir, gallery_file):
+def get_jquery(gallery_file):
+    jquery_found = False
+    for x in glob.glob(path.dirname(path.abspath(gallery_file)) +
+            directory_separator() + "jquery*.js"):
+        jquery_found = True
+        print "Found", x
+        return path.basename(x)
+
+    if jquery_found == False:
+        ans = raw_input("JQuery library not found. Download it now? [Y/n]")
+#----------------------------------------------------------------------------Finish this function.
+
+
+def make_link(img_loc):
+    """Injects a given file path into a hyperlinked <img> tag
+    and uses the filename as a generic 'alt' property."""
+
+    return str("<a href=\"javascript:showImg('" + img_loc + 
+                    "')\">" + "<img width=\"240\" height=\"180\" src=\"" + img_loc + "\"" +
+                    " alt=\"" + img_loc.split(directory_separator())[-1] + "\" /></a>""")
+
+
+def generate_gallery(img_dir, gallery_file, jquery_loc):
     tab = "    "
     file_list = []
     counter = 0
 
+# Loop through all files in the image directory and make a list of all files with the appropriate extensions
     for x in glob.glob(img_dir + '*'):
         if (x.split('.')[-1]).lower() in ('jpg', 'jpeg', 'gif', 'png', 'svg'):
             rel_dir = path.join(path.relpath(path.dirname(x), path.dirname(gallery_file)), path.basename(x))
             file_list.append(rel_dir)
 
+    for y in file_list:
+        if os.name == 'nt' and '\\' in y:
+            '\\'.replace('/')
+
+# Boilerplate code for output file
     with open(gallery_file, "w") as outfile:
         outfile.write("""
 <html>
@@ -65,7 +89,7 @@ def generate_gallery(img_dir, gallery_file):
 		}
 
 	</style>
-        <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src=""" + '"' +  jquery_loc + '"'  """></script>
 	<script>
 		var closeImg = function() {
 			$('#imgView img').remove();
@@ -86,6 +110,10 @@ def generate_gallery(img_dir, gallery_file):
     <div id="imgView"></div>
     <h1 style="text-align: center">Gallery</h1>
         <table>\n""")
+
+# Create a table 3 columns wide and n rows long,
+# where n is an even multiple of 3 and number of files in the list
+
         for x in range(len(file_list) / 3):
             outfile.write(tab*3 + "<tr>\n")
             for y in range(3):
@@ -94,6 +122,8 @@ def generate_gallery(img_dir, gallery_file):
             outfile.write(tab*3 + "</tr>\n")
         outfile.write(tab*2 + "</table>\n")
 
+# If the number of files was not an even multiple of 3, add the remaining files
+# in a center-aligned row beneath the table.
         if len(file_list) % 3 != 0:
             outfile.write(tab*2 + "<div style=\"display: block; text-align: center\">\n")
             for x in range(len(file_list) % 3):
@@ -106,10 +136,15 @@ def generate_gallery(img_dir, gallery_file):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print "Usage: pygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
+    if not len(sys.argv) == 3:
+        print "Usage: snappygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
     else:
         img_dir = sys.argv[1]
         gallery_file = sys.argv[2]
-        generate_gallery(img_dir, gallery_file)
+        
+        print "Looking for JQuery..."
+        jquery = get_jquery(gallery_file)
+
+        print "Generating gallery..."
+        generate_gallery(img_dir, gallery_file, jquery)
 
