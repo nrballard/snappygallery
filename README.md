@@ -4,7 +4,7 @@ Snappygallery is a utility for quickly generating simple, lightweight HTML galle
 
 It works by iterating through the image files in a specified image directory and then creating a table of linked thumbnails to each image. The images themselves are not modified, nor are any new images created. The thumbnails and corresponding overlays are sized through simple manipulation of the HTML “width” and “height” attributes.
 
-FEATURES:
+FEATURES:<br />
 Snappygallery can be run in two ways:<br />
 —Using traditional command-line argument passing, where the image directory and output file are passed in as the respective arguments<br />
 —Without arguments in an interactive mode, in which the user is prompted to supply the location of the image directory and output file.
