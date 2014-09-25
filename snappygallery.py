@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
-import os       
+import os, glob, sys, re  
 from os import path
-import glob
-import sys
+from urllib2 import urlopen
 
 def directory_separator():
     """Determines appropriate directory delimiter
@@ -18,15 +17,26 @@ def directory_separator():
 
 def get_jquery(gallery_file):
     jquery_found = False
-    for x in glob.glob(path.dirname(path.abspath(gallery_file)) +
-            directory_separator() + "jquery*.js"):
+    gallery_dir = path.dirname(path.abspath(gallery_file)) + directory_separator()
+    for x in glob.glob(gallery_dir + "jquery*.js"):
         jquery_found = True
         print "Found", x
+    if jquery_found == True:
         return path.basename(x)
 
     if jquery_found == False:
-        ans = raw_input("JQuery library not found. Download it now? [Y/n]")
-#----------------------------------------------------------------------------Finish this function.
+        ans = raw_input("JQuery library not found. Download it now? [Y/n] ")
+        if ans.lower() == "y" or "\n":
+            print "Downloading..."
+            dl_page = urlopen("http://jquery.com/download").read()
+            matches = re.findall("http://code\.jquery\.com/jquery-[0-9]*\.?[0-9]*\.?[0-9]*\.min\.js", dl_page)
+            matches.sort()      # Sort source files by version number if not already done
+            target = matches[0] # Download lowest version number to ensure we get a stable version
+            with open(gallery_dir + path.basename(target), 'wb') as outfile:
+                for line in urlopen(target).readlines():
+                    outfile.write(line)
+            print path.basename(target) + " downloaded successfully"
+            return path.basename(target)
 
 
 def make_link(img_loc):
@@ -134,17 +144,45 @@ def generate_gallery(img_dir, gallery_file, jquery_loc):
     </body>
 </html>""")
 
+def main(img_dir, gallery_file):
+    img_count = 0
+
+    if not path.exists(img_dir):
+        print "Invalid image directory"
+        return
+
+    if not img_dir[-1] == directory_separator():
+        img_dir += directory_separator()
+
+    for x in glob.glob(img_dir + '*'):
+        if (x.split('.')[-1]).lower() in ('jpg', 'jpeg', 'gif', 'png', 'svg'):
+            img_count += 1
+
+    if img_count == 0:
+        print "No browser-compatible images in directory provided"
+        return
+
+    print "Looking for JQuery..."
+    jquery = get_jquery(gallery_file)
+
+    print "Generating gallery..."
+    generate_gallery(img_dir, gallery_file, jquery)
+
 
 if __name__ == "__main__":
-    if not len(sys.argv) == 3:
-        print "Usage: snappygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
-    else:
+    if len(sys.argv) == 1:
+        img_dir = raw_input("Enter image path: ")
+        gallery_file = raw_input("Enter gallery filename: ")
+
+        main(img_dir, gallery_file)
+
+
+    elif len(sys.argv) == 3:
         img_dir = sys.argv[1]
         gallery_file = sys.argv[2]
-        
-        print "Looking for JQuery..."
-        jquery = get_jquery(gallery_file)
 
-        print "Generating gallery..."
-        generate_gallery(img_dir, gallery_file, jquery)
+        main(img_dir, gallery_file)
+        
+    else:
+        print "Usage: snappygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
 
