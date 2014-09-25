@@ -25,18 +25,25 @@ def get_jquery(gallery_file):
         return path.basename(x)
 
     if jquery_found == False:
-        ans = raw_input("JQuery library not found. Download it now? [Y/n] ")
-        if ans.lower() == "y" or "\n":
-            print "Downloading..."
-            dl_page = urlopen("http://jquery.com/download").read()
-            matches = re.findall("http://code\.jquery\.com/jquery-[0-9]*\.?[0-9]*\.?[0-9]*\.min\.js", dl_page)
-            matches.sort()      # Sort source files by version number if not already done
-            target = matches[0] # Download lowest version number to ensure we get a stable version
-            with open(gallery_dir + path.basename(target), 'wb') as outfile:
-                for line in urlopen(target).readlines():
-                    outfile.write(line)
-            print path.basename(target) + " downloaded successfully"
-            return path.basename(target)
+        ans = ""
+        while not ans.lower() == "y" or "n":
+            ans = raw_input("JQuery library not found. Download it now? [Y/n] ")
+            if ans.lower() == "n":
+                print "Exiting."
+                sys.exit(0)
+            elif ans.lower() == "y" or ans.lower() == "":
+                print "Downloading..."
+                dl_page = urlopen("http://jquery.com/download").read()
+                matches = re.findall("http://code\.jquery\.com/jquery-[0-9]*\.?[0-9]*\.?[0-9]*\.min\.js", dl_page)
+                matches.sort()      # Sort source files by version number if not already done
+                target = matches[0] # Download lowest version number to ensure we get a stable version
+                with open(gallery_dir + path.basename(target), 'wb') as outfile:
+                    for line in urlopen(target).readlines():
+                        outfile.write(line)
+                print path.basename(target) + " downloaded successfully"
+                return path.basename(target)
+            else:
+                ans = raw_input("Invalid input. Press Enter to continue.")
 
 
 def make_link(img_loc):
