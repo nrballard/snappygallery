@@ -13,4 +13,5 @@ Snappygallery depends on JQuery to provide the the gallery functionality of the 
 
 
 LIMITATIONS:<br />
-—Snappygallery does not currently generate galleries spanning multiple pages.
+—Snappygallery does not currently generate galleries spanning multiple pages. Consequently, large image directories will generate large HTML files that may load slowly in the browser.<br />
+-Similarly, galleries with large image files may load slowly since Snappygallery does not resize the gallery images.
