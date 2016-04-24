@@ -184,7 +184,7 @@ def main(img_dir, gallery_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "USAGE: snappygallery IMAGE_DIRECTORY OUTPUT_FILE/n"
+        print "USAGE: snappygallery IMAGE_DIRECTORY OUTPUT_FILE"
 
     else:
         img_dir = sys.argv[1]
