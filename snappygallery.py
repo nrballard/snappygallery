@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
-import os, glob, sys, re  
+import os
+import glob
+import sys
+import re
+import urllib2
 from os import path
-from urllib2 import urlopen
+
 
 def directory_separator():
     """Determines appropriate directory delimiter
@@ -20,11 +24,12 @@ def get_jquery(gallery_file):
     gallery_dir = path.dirname(path.abspath(gallery_file)) + directory_separator()
     for x in glob.glob(gallery_dir + "jquery*.js"):
         jquery_found = True
+        break
+    if jquery_found:
         print "Found", x
-    if jquery_found == True:
         return path.basename(x)
 
-    if jquery_found == False:
+    if not jquery_found:
         ans = ""
         while not ans.lower() == "y" or "n":
             ans = raw_input("JQuery library not found. Download it now? [Y/n] ")
@@ -33,12 +38,13 @@ def get_jquery(gallery_file):
                 sys.exit(0)
             elif ans.lower() == "y" or ans.lower() == "":
                 print "Downloading..."
-                dl_page = urlopen("http://jquery.com/download").read()
-                matches = re.findall("http://code\.jquery\.com/jquery-[0-9]*\.?[0-9]*\.?[0-9]*\.min\.js", dl_page)
+                dl_req = urllib2.Request("http://jquery.com/download", headers={"User-Agent": "lynx"})
+                dl_page = urllib2.urlopen(dl_req).read()
+                matches = re.findall("https://code\.jquery\.com/jquery-[0-9]*\.?[0-9]*\.?[0-9]*\.min\.js", dl_page)
                 matches.sort()      # Sort source files by version number if not already done
                 target = matches[0] # Download lowest version number to ensure we get a stable version
                 with open(gallery_dir + path.basename(target), 'wb') as outfile:
-                    for line in urlopen(target).readlines():
+                    for line in urllib2.urlopen(target).readlines():
                         outfile.write(line)
                 print path.basename(target) + " downloaded successfully"
                 return path.basename(target)
@@ -177,19 +183,11 @@ def main(img_dir, gallery_file):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        img_dir = raw_input("Enter image path: ")
-        gallery_file = raw_input("Enter gallery filename: ")
+    if len(sys.argv) != 3:
+        print "USAGE: snappygallery IMAGE_DIRECTORY OUTPUT_FILE/n"
 
-        main(img_dir, gallery_file)
-
-
-    elif len(sys.argv) == 3:
+    else:
         img_dir = sys.argv[1]
         gallery_file = sys.argv[2]
 
         main(img_dir, gallery_file)
-        
-    else:
-        print "Usage: snappygallery <IMAGE_DIRECTORY> <OUTPUT_FILE>"
-
